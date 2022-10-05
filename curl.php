@@ -2,10 +2,10 @@
 
 namespace PhpCurl;
 
-use CurlHandle;
 use CurlShareHandle;
-
+use CurlHandle;
 use Error;
+
 use function
     curl_init,
     curl_setopt,
@@ -37,7 +37,7 @@ class Curl {
         }
     }
     
-    public function initialize(bool $share = true):self {
+    public function initializeRequest(bool $share = true, int $timeout = 20, int $maxRedirects = 20):self {
         
         if($share && empty($this->shareHandle)) {
             $this->shareHandle = curl_share_init();
@@ -67,20 +67,20 @@ class Curl {
         curl_setopt($this->handle, CURLOPT_FAILONERROR, true);
         
         curl_setopt($this->handle, CURLOPT_TCP_FASTOPEN, true);
-        curl_setopt($this->handle, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($this->handle, CURLOPT_CONNECTTIMEOUT, $timeout * (1 / 3));
         curl_setopt($this->handle, CURLOPT_SSLVERSION, CURL_SSLVERSION_MAX_DEFAULT );
-        curl_setopt($this->handle, CURLOPT_SSL_VERIFYSTATUS, false);
+        curl_setopt($this->handle, CURLOPT_SSL_VERIFYSTATUS, true);
         curl_setopt($this->handle, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($this->handle, CURLOPT_SSL_FALSESTART, true);
         curl_setopt($this->handle, CURLOPT_DNS_SHUFFLE_ADDRESSES, true);
         
         curl_setopt($this->handle, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($this->handle, CURLOPT_MAXREDIRS, 20);
+        curl_setopt($this->handle, CURLOPT_MAXREDIRS, $maxRedirects);
         curl_setopt($this->handle, CURLOPT_AUTOREFERER, true);
         
         curl_setopt($this->handle, CURLOPT_HEADER, true);
         curl_setopt($this->handle, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->handle, CURLOPT_TIMEOUT, 25);
+        curl_setopt($this->handle, CURLOPT_TIMEOUT, $timeout);
         
         return $this;
         
